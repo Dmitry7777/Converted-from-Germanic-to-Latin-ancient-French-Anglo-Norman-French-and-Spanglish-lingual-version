@@ -1,733 +1,836 @@
-Remove = Germanic language;
-Replace = Latin language;
-Replace = Anglo-Norman language;
-Replace = Iberian-Romance language;
-Description = English US;
-Language = en;
-Prefix = "";
-Origin = "";
-Suffix = "";
+import re
+
+# Define your dictionary
+personal_dictionary = {
+    "earthly": "terrestrial",
+    "Earth": "Terra",
+    "understand": "comprehend",
+    "understands": "comprehends",
+    "understood": "comprehended",
+    "understanding": "comprehending",
+    "hold": "maintain",
+    "holds": "maintains",
+    "held": "maintained",
+    "holding": "maintaining",
+    "many cultures": "numerous cultures",
+    "flaw": "defect",
+    "flaws": "defects",
+    "flaw": "insufficiency",
+    "flaws": "insufficiencies",
+    "flaw": "failure",
+    "flaws": "failures",
+    "wonder": "marvel",
+    "wonders": "marvels",
+    "wondered": "marveled",
+    "wondering": "marveling",
+    "unknown": "infamous",
+    "unknown": "incognito",
+    "free": "vacant",
+    "free": "liberate",
+    "frees": "liberates",
+    "freed": "liberated",
+    "freeing": "liberating",
+    "slaughter": "sacrifice",
+    "slaughters": "sacrifices",
+    "slaughtered": "sacrificed",
+    "slaughtering": "sacrificing",
+    "slaughter": "immolate",
+    "slaughters": "immolates",
+    "slaughtered": "immolated",
+    "slaughtering": "immolating",
+    "team": "associate",
+    "teams": "associates",
+    "teamed": "associated",
+    "teaming": "associating",
+    "ditch": "abandon",
+    "ditches": "abandons",
+    "ditched": "abandoned",
+    "ditching": "abandoning",
+    "ditch": "conduit",
+    "ditches": "conduits",
+    "ditch": "acequia",
+    "ditches": "acequias",
+    "run off": "escape",
+    "runs off": "escapes",
+    "ran off": "escaped",
+    "running off": "escaping",
+    "fulfill": "accomplish",
+    "fulfills": "accomplishes",
+    "fulfilled": "accomplished",
+    "fulfilling": "accomplishing",
+    "fulfill": "comply",
+    "fulfills": "complies",
+    "fulfilled": "complied",
+    "fulfilling": "complying",
+    "work it out": "resolve it",
+    "works it out": "resolves it",
+    "worked it out": "resolved it",
+    "working it out": "resolving it",
+    "say": "declare",
+    "says": "declares",
+    "said": "declared",
+    "saying": "declaring",
+    "saying": "statement",
+    "saying": "rumor",
+    "sayings": "statements",
+    "sayings": "rumors",
+    "craft": "elaborate;",
+    "crafts": "elaborates",
+    "crafted": "elaborated",
+    "crafting": "elaborating",
+    "craft": "create",
+    "crafts": "creates",
+    "crafted": "created",
+    "crafting": "creating",
+    "make ready": "prepare",
+    "makes ready": "prepares",
+    "made ready": "prepared",
+    "making ready": "preparing",
+    "make harder": "complicate",
+    "makes harder": "complicates",
+    "made harder": "complicated",
+    "making harder": "complicating",
+    "make them harder": "complicate them",
+    "makes them harder": "complicates them",
+    "made them harder": "complicated them",
+    "making them harder": "complicating them",
+    "tell": "inform",
+    "tells": "informs",
+    "told": "informed",
+    "telling": "informing",
+    "become angry": "annoy",
+    "becomes angry": "annoys",
+    "became angry": "annoyed",
+    "becoming angry": "annoying",
+    "become angry": "infuriate",
+    "becomes angry": "infuriates",
+    "became angry": "infuriated",
+    "becoming angry": "nfuriating",
+    "ask for": "request",
+    "asks for": "requests",
+    "asked for": "requested",
+    "asking for": "requesting",
+    "ask to": "question",
+    "asks to": "questions",
+    "asked to": "questioned",
+    "asking to": "questioning",
+    "cleave": "adhere",
+    "cleaves": "adheres",
+    "cleaved": "adhered",
+    "cleaving": "adhering",
+    "cleave": "divide",
+    "cleaves": "divides",
+    "cleaved": "divided",
+    "cleaving": "dividing",
+    "cleave": "dissect",
+    "cleaves": "dissects",
+    "cleaved": "dissected",
+    "cleaving": "dissecting",
+"steer": "direct",
+"steers": "directs",
+"steered": "directed",
+"steering": "directing",
+"give birth": "engender",
+"gives birth": "engenders",
+"given birth": "engendered",
+"gave birth": "engendered",
+"giving birth": "engendering",
+    "tie up": "attach",
+    "ties up": "attaches",
+    "tied up": "attached",
+    "tying up": "attaching",
+    "tie up": "adjoin",
+    "ties up": "adjoins",
+    "tied up": "adjoined;",
+    "tying up": "adjoining",
+    "tied up": "adjoined",
+    "slough off": "detach",
+    "sloughs off": "detaches",
+    "sloughed off": "detached",
+    "sloughing off": "detaching",
+    "shirk": "elude",
+    "shirks": "eludes",
+    "shirked": "eluded",
+    "shirking": "eluding",
+    "break off with": "finish relation with",
+    "breaks off with": "finishes relation with",
+    "broke off with": "finished relation with",
+    "broken off with": "finished relation with",
+    "breaking off with": "finishing relation with",
+    "graft in": "instill",
+    "grafts in": "instills",
+    "grafted in": "instilled",
+    "grafting in": "instilling",
+    "leave high and dry": "desert",
+    "leaves high and dries": "deserts",
+    "left high and dried": "deserted",
+    "leaving high and drying": "deserting",
+    "blaze": "flame",
+    "blazes": "flames",
+    "blazed": "flamed",
+    "blazing": "flaming",
+    "skive off": "evade",
+    "skives off": "evades",
+    "skived off": "evaded",
+    "skiving off": "evading",
+    "outshine": "eclipse",
+    "outshines": "eclipses",
+    "outshined": "eclipsed",
+    "outshining": "eclipsing",
+    "give life": "vivify",
+    "gives life": "vivifies",
+    "gave life": "vivified",
+    "given life": "vivified",
+    "giving life": "vivifying",
+    "show off": "exhibit",
+    "shows off": "exhibits",
+    "showed off": "exhibited",
+    "shown off": "exhibited",
+    "showing off": "exhibiting",
+    "find out": "discover",
+    "finds out": "discovers",
+    "found out": "discovered",
+    "finding out": "discovering",
+    "set out": "expose",
+    "sets out": "exposes",
+    "set out": "exposed",
+    "setting out": "exposing",
+    "help out": "assist",
+    "helps out": "assists",
+    "helped out": "assisted",
+    "helping out": "assisting",
+    "take out": "remove",
+    "takes out": "removes",
+    "took out": "removed",
+    "taken out": "removed",
+    "taking out": "removing",
+    "die out": "extinguish",
+    "dies out": "extinguishes",
+    "died out": "extinguished",
+    "dying out": "extinguishing",
+    "show up": "appear",
+    "shows up": "appears",
+    "showed up": "appeared",
+    "showing up": "appearing",
+    "run out of": "complete",
+    "runs out of": "completes",
+    "ran out of": "completed",
+    "running out of": "completing",
+    "keep up": "continue",
+    "keeps up": "continues",
+    "kept up": "continued",
+    "keeping up": "continuing",
+    "hold on": "expect",
+    "holds on": "expects",
+    "held on": "expected",
+    "holding on": "expecting",
+    "set up": "adjust",
+    "sets up": "adjusts",
+    "set up": "adjusted",
+    "setting up": "adjusting",
+    "run into": "encounter",
+    "runs into": "encounters",
+    "ran into": "encountered",
+    "running into": "encountering",
+    "rule out": "exclude",
+    "rules out": "excludes",
+    "ruled out": "excluded",
+    "ruling out": "excluding",
+    "hold off": "suspend",
+    "holds off": "suspends",
+    "held off": "suspended",
+    "holding off": "suspending",
+    "cut back": "abridge",
+    "cuts back": "abridges",
+    "cut back": "abridged",
+    "cutting back": "abridging",
+    "lap over": "superpose",
+    "laps over": "superposes",
+    "lapped over": "superposed",
+    "lapping over": "superposing",
+    "check out": "verify",
+    "checks out": "verifies",
+    "checked out": "verified",
+    "checking out": "verifying",
+    "get started": "commence",
+    "gets started": "commences",
+    "got started": "commenced",
+    "gotten started": "commenced",
+    "getting started": "commencing",
+    "shorten": "reduce",
+    "shortens": "reduces",
+    "shortened": "reduced",
+    "shortening": "reducing",
+    "bloom": "flourish",
+    "blooms": "flourishes",
+    "bloomed": "flourished",
+    "blooming": "flourishing",
+"strike down": "abolish; destroy",
+    "strikes down": "abolishes; destroys",
+    "struck down": "abolished; destroyed",
+    "striking down": "abolishing; destroying",
+    "overthrow": "expel; conquer",
+    "overthrows": "expels; conquers",
+    "overthrown": "expelled; conquered",
+    "overthrowing": "expelling; conquering",
+    "smite": "castigate",
+    "smites": "castigates",
+    "smitten": "castigate",
+    "smiting": "castigate",
+    "have got": "obtain",
+    "has got": "obtains",
+    "had got": "obtained",
+    "having got": "obtaining",
+    "become less": "diminish",
+    "becomes less": "diminishes",
+    "became less": "diminished",
+    "becoming less": "diminishing",
+    "make talk": "make conversation",
+    "makes talk": "makes conversation",
+    "made talk": "made conversation",
+    "making talk": "making conversation",
+    "make it talk": "make it conversation",
+    "makes it talk": "makes it conversation",
+    "made it talk": "made it conversation",
+    "making it talk": "making it conversation",
+    "make him talk": "make him conversation",
+    "makes him talk": "makes him conversation",
+    "made him talk": "made him conversation",
+    "making him talk": "making him conversation",
+    "make her talk": "make her conversation",
+    "makes her talk": "makes her conversation",
+    "made her talk": "made her conversation",
+    "making her talk": "making her conversation",
+    "make them talk": "make them conversation",
+    "makes them talk": "makes them conversation",
+    "made them talk": "made them conversation",
+    "making them talk": "making them conversation",
+    "give a talk": "orate",
+    "gives a talk": "orates",
+    "given a talk": "orated",
+    "gave a talk": "orated",
+    "giving a talk": "orating",
+    "make know": "reveal; discover; explain",
+    "makes know": "reveals; discovers; explains",
+    "made know": "revealed; discovered; explained",
+    "making know": "revealing; discovering; explaining",
+    "make them know": "reveal them; discover them; explain them",
+    "makes them know": "reveals them; discovers them; explains them",
+    "made them know": "revealed them; discovered them; explained them",
+    "making them know": "revealing them; discovering them; explaining them",
+    "make it know": "reveal it; discover it; explain it",
+    "makes it know": "reveals them; discovers it; explains it",
+    "made it know": "revealed it; discovered it; explained it",
+    "making it know": "revealing it; discovering it; explaining it",
+    "make her know": "reveal her; discover her; explain her",
+    "makes her know": "reveals her; discovers her; explains her",
+    "made her know": "revealed her; discovered her; explained her",
+    "making her know": "revealing her; discovering her; explaining her",
+    "dwell": "inhabit; reside in",
+    "dwells": "inhabits; resides in",
+    "dwelled": "inhabited; resided in",
+    "dwelling": "inhabiting; residing in",
+    "speed up": "accelerate",
+    "speeds up": "accelerates",
+    "speeded up": "accelerated",
+    "speeding up": "accelerating",
+    "forbid": "prohibit",
+    "forbids": "prohibits",
+    "forbidden": "prohibited",
+    "forbidding": "prohibiting",
+    "behead": "decapitate",
+    "beheads": "decapitates",
+    "beheaded": "decapitated",
+    "beheading": "decapitating",
+    "feel": "sense",
+    "feels": "senses",
+    "felt": "sensed",
+    "feeling": "sensing",
+    "a feeling": "a sentiment",
+    "the feeling": "the sentiment",
+    "feelings": "sentiments",
+    "fuck you": "maledict you",
+    "fucks you": "maledicts you",
+    "fucked you": "maledicted you",
+    "fucking you": "maledicting you",
+    "fuck": "maledict; abominate; procreate; damn; deplore; fornicate",
+    "fucks": "maledicts; abominates; procreates; damns; deplores; fornicates",
+    "fucked": "maledicted; abominated; procreated; damned; deplored; fornicated",
+    "fucking": "maledicting; abominating; abomination; malediction; procreating; damning; damnation; deploring; fornicating; fornication",
+    "kindred": "family; relative",
+    "kindreds": "families; relatives",
+    "heavens": "celestial places",
+    "weather": "climatic condition",
+    "weathers": "climatic conditions",
+    "flaw": "defect",
+    "flaws": "defects",
+    "flaw": "insufficiency",
+    "flaws": "insufficiencies",
+    "flaw": "failure",
+    "flaws": "failures",
+    "keep telling": "repeat; predict",
+    "keeps telling": "repeats; predicts",
+    "kept telling": "repeated; predicted",
+    "keeping telling": "repeating; predicting",
+    "fill out": "enroll",
+    "fills out": "enrolls",
+    "filled out": "enrolled",
+    "filling out": "enrolling",
+    "get tired": "fatigue",
+    "gets tired": "fatigues",
+    "got tired": "fatigued",
+    "gotten tired": "fatigued",
+    "getting tired": "fatiguing",
+    "take hold": "capture; cover",
+    "takes hold": "captures; covers",
+    "took hold": "captured; covered",
+    "taken hold": "captured; covered",
+    "taking hold": "capturing; covering",
+    "do wrong": "commit malice; disobey",
+    "does wrong": "commits malice; disobeys",
+    "did wrong": "committed malice; disobeyed",
+    "done wrong": "committed malice; disobeyed",
+    "doing wrong": "committing malice; disobeying",
+    "gnash": "grate",
+    "gnashes": "grates",
+    "gnashed": "grated",
+    "gnashing": "grating",
+    "put him out": "expel him",
+    "puts him out": "expels him",
+    "put him out": "expelled him",
+    "putting him out": "expelling him",
+    "put them out": "expel them",
+    "puts them out": "expels them",
+    "put them out": "expelled them",
+    "putting them out": "expelling them",
+    "put her out": "expel her",
+    "puts her out": "expels her",
+    "put her out": "expelled her",
+    "putting her out": "expelling her",
+    "put out": "expel",
+    "puts out": "expels",
+    "put out": "expelled",
+    "putting out": "expelling",
+    "become blind": "deprive of vision",
+    "becomes blind": "deprives of vision",
+    "became blind": "deprived of vision",
+    "becoming blind": "depriving of vision",
+    "become flesh": "incarnate; personify",
+    "becomes flesh": "incarnates; personifies",
+    "became flesh": "incarnated; personified",
+    "becoming flesh": "incarnating; personifying",
+    "spring up": "inspirit",
+    "springs up": "inspirits",
+    "sprang up": "inspirited",
+    "sprung up": "inspirited",
+    "springing up": "inspiriting",
+    "spring up": "inspire",
+    "springs up": "inspires",
+    "sprang up": "inspired",
+    "sprung up": "inspired",
+    "springing up": "inspiring",
+    "spring up": "effuse",
+    "springs up": "effuses",
+    "sprang up": "effused",
+    "sprung up": "effused",
+    "springing up": "effusing",
+    "spring up": "bound",
+    "springs up": "bounds",
+    "sprang up": "bounded",
+    "sprung up": "bounded",
+    "springing up": "bounding",
+    "spring up": "germinate",
+    "springs up": "germinates",
+    "sprang up": "germinated",
+    "sprung up": "germinated",
+    "springing up": "germinating",
+    "bring": "adduce",
+    "brings": "adduces",
+    "brought": "adduced",
+    "bringing": "adducing",
+    "seek": "search for",
+    "seeks": "searches for",
+    "sought": "searched for",
+    "seeking": "searching for",
+    "seek": "aspire",
+    "seeks": "aspires",
+    "sought": "aspired",
+    "seeking": "aspiring",
+    "seek": "buscate",
+    "seeks": "buscates",
+    "sought": "sbuscated",
+    "seeking": "buscating",
+    "look at": "contemplate",
+    "looks at": "contemplates",
+    "looked at": "contemplated",
+    "looking at": "contemplating",
+    "belong": "appertain",
+    "belongs": "appertains",
+    "belonged": "appertained",
+    "belonging": "appertaining",
+    "go forth": "advance",
+    "goes forth": "advances",
+    "gone forth": "advanced",
+    "went forth": "advanced",
+    "going forth": "advancing",
+    "go forth": "propel",
+    "goes forth": "propels",
+    "gone forth": "propelled",
+    "went forth": "propelled",
+    "going forth": "propelling",
+    "tear off": "disrupt",
+    "tears off": "disrupts",
+    "torn off": "disrupted",
+    "tearing off": "disrupting"
+    "break away": "separate",
+    "breaks away": "separates",
+    "broke away": "separated",
+    "broken away": "separated",
+    "breaking away": "separating",
+    "stiffen": "solidify",
+    "stiffens": "solidifies",
+    "stiffened": "solidified",
+    "stiffening": "solidifying",
+    "stiffen": "congeal",
+    "stiffens": "congeals",
+    "stiffened": "congealed",
+    "stiffening": "congealing",
+    "snap": "rupture",
+    "snaps": "ruptures",
+    "snapped": "ruptured",
+    "snapping": "rupturing",
+    "snap": "fracture",
+    "snaps": "fractures",
+    "snapped": "fractured",
+    "snapping": "fracturing",
+    "warp": "tissue",
+    "warps": "tissues",
+    "warp": "deform",
+    "warps": "deforms",
+    "warped": "deformed",
+    "warping": "deforming",
+    "warp": "malform",
+    "warps": "malforms",
+    "warped": "malformed",
+    "warping": "malforming",
+    "warp": "distort",
+    "warps": "distorts",
+    "warped": "distorted",
+    "warping": "distorting",
+    "warp": "contort",
+    "warps": "contorts",
+    "warped": "contorted",
+    "warping": "contorting",
+    "tear apart": "disrupt apart",
+    "tears apart": "disrupts apart",
+    "torn apart": "disrupted apart",
+    "tearing apart": "disrupting apart",
+    "go outside": "exit externally",
+    "goes outside": "exits externally",
+    "gone outside": "exited externally",
+    "went outside": "exited externally",
+    "going outside": "exiting externally",
+    "speak out": "prophesy",
+    "speaks out": "prophesies",
+    "spoke out": "prophesied",
+    "spoken out": "prophesied",
+    "speaking out": "prophesying",
+    "speak out": "predict",
+    "speaks out": "predicts",
+    "spoke out": "predicted",
+    "spoken out": "predicted",
+    "speaking out": "predicting",
+    "speak ... out": "prophesy",
+    "speaks ... out": "prophesies",
+    "spoke ... out": "prophesied",
+    "spoken ... out": "prophesied",
+    "speaking ... out": "prophesying",
+    "speak ... out": "predict",
+    "speaks ... out": "predicts",
+    "spoke ... out": "predicted",
+    "spoken ... out": "predicted",
+    "speaking ... out": "predicting",
+    "shower": "douche",
+    "showers": "douches",
+    "showered": "douched",
+    "showering": "douching",
+    "hate": "abhor",
+    "hates": "abhors",
+    "hated": "abhorred",
+    "hating": "abhorring",
+    "hate": "detest",
+    "hates": "detests",
+    "hated": "detested",
+    "hating": "detesting",
+    "hedge up": "encircle",
+    "hedges up": "encircles",
+    "hedged up": "encircled",
+    "hedging up": "encircling",
+    "hedge up": "cover",
+    "hedges up": "covers",
+    "hedged up": "covered",
+    "hedging up": "covering",
+    "slip away": "elude",
+    "slips away": "eludes",
+    "slipped away": "eluded",
+    "slipping away": "eluding"
+    "slight": "insult",
+    "slights": "insults",
+    "slighted": "insulted",
+    "slighting": "insulting",
+    "slight": "affront",
+    "slights": "affronts",
+    "slighted": "affronted",
+    "slighting": "affronting",
+    "slight": "repulse",
+    "slights": "repulses",
+    "slighted": "repulsed",
+    "slighting": "repulsing",
+    "slight": "repulsion",
+    "slights": "repulsions",
+    "slight": "modest",
+    "slight": "desirable",
+    "slight": "minor",
+    "slight": "insignificant",
+    "slight": "easy",
+    "slight": "facile",
+    "slight": "facility",
+    "loathe": "detest",
+    "loathes": "detests",
+    "loathed": "detested",
+    "loathing": "detesting",
+    "loathe": "aversion",
+    "loathes": "aversions",
+    "break out": "escape",
+    "breaks out": "escapes",
+    "broke out": "escaped",
+    "broken out": "escaped",
+    "breaking out": "escaping",
+    "hire": "rent",
+    "hires": "rents",
+    "hired": "rented",
+    "hiring": "renting",
+    "shun": "evade",
+    "shuns": "evades",
+    "shunned": "evaded",
+    "shunning": "evading",
+    "quake": "tremble",
+    "quakes": "trembles",
+    "quaked": "trembled",
+    "quaking": "trembling",
+    "blade": "razor",
+    "blades": "razors",
+    "bladed": "razored",
+    "blading": "razoring",
+    "blade": "herb",
+    "blades herbs",
+    "blade": "coulter",
+    "blades": "coulters",
+    "wear away": "erode",
+    "wears away": "erodes",
+    "worn away": "eroded",
+    "wearing away": "eroding",
+    "wear away": "dissolve",
+    "wears away": "dissolves",
+    "worn away": "dissolved",
+    "wearing away": "dissolving",
+    "wear down": "abrade",
+    "wears down": "abrades",
+    "worn down": "abraded",
+    "wearing down": "abrading",
+    "wear down": "erode",
+    "wears down": "erodes",
+    "worn down": "eroded",
+    "wearing down": "eroding",
+    "eat away": "consume",
+    "eats away": "consumes",
+    "ate away": "consumed",
+    "eaten away": "consumed",
+    "eating away": "consuming",
+    "fetch": "recover",
+    "fetches": "recovers",
+    "fetched": "recovered",
+    "fetching": "recovering",
+    "fetch": "recuperate",
+    "fetches": "recuperates",
+    "fetched": "recuperated",
+    "fetching": "recuperating",
+    "fetch": "obtain",
+    "fetches": "obtains",
+    "fetched": "obtained",
+    "fetching": "obtaining",
+    "fetch": "search for",
+    "fetches": "searches for",
+    "fetched": "searched for",
+    "fetching": "searching for",
+    "bring in": "adduce",
+    "brings in": "adduces",
+    "brought in": "adduced",
+    "bringing in": "adducing",
+    "bring in": "introduce",
+    "brings in": "introduces",
+    "brought in": "introduced",
+    "bringing in": "introducing",
+    "bring low": "humble",
+    "brings low": "humbles",
+    "brought low": "humbled",
+    "bringing low": "humbling",
+    "bring low": "humiliate",
+    "brings low": "humiliates",
+    "brought low": "humiliated",
+    "bringing low": "humiliating",
+    "bring low": "disappear",
+    "brings low": "disappears",
+    "brought low": "disappeared",
+    "bringing low": "disappearing",
+    "whistle": "sibilate",
+    "whistles": "sibilates",
+    "whistled": "sibilated",
+    "whistling": "sibilating",
+    "blot out": "obliterate",
+    "blots out": "obliterates",
+    "blotted out": "obliterated",
+    "blotting out": "obliterating",
+    "get rid of": "dispose of",
+    "gets rid of": "disposes of",
+    "got rid of": "disposed of",
+    "gotten rid of": "disposed of",
+    "getting rid of": "disposing of",
+    "kill off": "destroy",
+    "kills off": "destroys",
+    "killed off": "destroyed",
+    "killing off": "destroying",
+    "gather up": "collect",
+    "gathers up": "collects",
+    "gathered up": "collected",
+    "gathering up": "collecting",
+    "gather up": "capture",
+    "gathers up": "captures",
+    "gathered up": "captured",
+    "gathering up": "capturing",
+    "gather up": "accept",
+    "gathers up": "accepts",
+    "gathered up": "accepted",
+    "gathering up": "accepting",
+    "become waterless": "evaporate",
+    "becomes waterless": "evaporates",
+    "became waterless": "evaporated",
+    "becoming waterless": "evaporating",
+    "become waterless": "desiccate",
+    "becomes waterless": "desiccates",
+    "became waterless": "desiccated",
+    "becoming waterless": "desiccating",
+    "rust": "corrode",
+    "rusts": "corrodes",
+    "rusted": "corroded",
+    "rusting": "corroding",
+    "rust": "oxidize",
+    "rusts": "oxidizes",
+    "rusted": "oxidized",
+    "rusting": "oxidizing",
+    "rust": "oxidation",
+    "rusts": "oxidations",
+    "come back": "revert",
+    "comes back": "reverts",
+    "came back": "reverted",
+    "coming back": "reverting",
+    "take the oath": "assert",
+    "takes the oath": "asserts",
+    "took the oath": "asserted",
+    "taken the oath": "asserted",
+    "taking the oath": "asserting",
+    "take the oath": "asseverate",
+    "takes the oath": "asseverates",
+    "took the oath": "asseverated",
+    "taken the oath": "asseverated",
+    "taking the oath": "asseverating",
+    "look after": "supervise",
+    "looks after": "supervises",
+    "looked after": "supervised",
+    "looking after": "supervising",
+    "look after": "control",
+    "looks after": "controls",
+    "looked after": "controlled",
+    "looking after": "controlling",
+    "send out": "transmit",
+    "sends out": "transmits",
+    "sent out": "transmitted",
+    "sending out": "transmitting",
+    "send out": "release",
+    "sends out": "releases",
+    "sent out": "released",
+    "sending out": "releasing",
+    "send out": "exude",
+    "sends out": "exudes",
+    "sent out": "exuded",
+    "sending out": "exuding",
+    "send out": "envy",
+    "sends out": "envies",
+    "sent out": "envied",
+    "sending out": "envying",
+    "send away from": "disclaim",
+    "sends away from": "disclaims",
+    "sent away from": "disclaimed",
+    "sending away from": "disclaiming",
+    "send away from": "expel from",
+    "sends away from": "expels from",
+    "sent away from": "expelled from",
+    "sending away from": "expelling from",
+    "thrust out": "recycle",
+    "thrusts out": "recycles",
+    "thrusted out": "recycled",
+    "thrusting out": "recycling",
+    "thrust out": "expel",
+    "thrusts out": "expels",
+    "thrusted out": "expelled",
+    "thrusting out": "expelling",
+    "thrust out": "expulse",
+    "thrusts out": "expulses",
+    "thrusted out": "expulsed",
+    "thrusting out": "expulsing",
+    "set out": "establish",
+    "sets out": "establishes",
+    "setted out": "established",
+    "setting out": "establishing",
+    "shear": "barber",
+    "shears": "barbers",
+    "sheared": "barbered",
+    "shearing": "barbering",
+    "harden": "indurate",
+    "hardens": "indurates",
+    "hardened": "indurated",
+    "hardening": "indurating",
+    "harden": "solidify",
+    "hardens": "solidifies",
+    "hardened": "solidified",
+    "hardening": "solidifying",
+    "harden": "endure",
+    "hardens": "endures",
+    "hardened": "endured",
+    "hardening": "enduring",
+    "go astray": "stray",
+    "goes astray": "strays",
+    "gone astray": "strayed",
+    "went astray": "strayed",
+    "going astray": "straying"
 
 
-slaughter	sacrifice
-slaughters	sacrifices
-slaughtered	sacrificed
-slaughtering	sacrificing
-slaughter	immolate
-slaughters	immolates
-slaughtered	immolated
-slaughtering	immolating
-bring	adduce
-brings	adduces
-brought	adduced
-bringing	adducing
-seek	search for
-seeks	searches for
-sought	searched for
-seeking	searching for
-enough	sufficient
-look at	contemplate
-looks at	contemplates
-looked at	contemplated
-looking at	contemplating
-belong	appertain
-belongs	appertains
-belonged	appertained
-belonging	appertaining
-go forth	advance
-goes forth	advances
-gone forth	advanced
-went forth	advanced
-going forth	advancing
-go forth	propel
-goes forth	propels
-gone forth	propelled
-went forth	propelled
-going forth	propelling
-tear off	disrupt
-tears off	disrupts
-torn off	disrupted
-tearing off	disrupting
-break away	separate
-breaks away	separates
-broke away	separated
-broken away	separated
-breaking away	separating
-stiffen	solidify
-stiffens	solidifies
-stiffened	solidified
-stiffening	solidifying
-stiffen	congeal
-stiffens	congeals
-stiffened	congealed
-stiffening	congealing
-snap	rupture
-snaps	ruptures
-snapped	ruptured
-snapping	rupturing
-snap	fracture
-snaps	fractures
-snapped	fractured
-snapping	fracturing
-warp	deform
-warps	deforms
-warped	deformed
-warping	deforming
-warp	distort
-warps	distorts
-warped	distorted
-warping	distorting
-warp	contort
-warps	contorts
-warped	contorted
-warping	contorting
-tear apart	disrupt apart
-tears apart	disrupts apart
-torn apart	disrupted apart
-tearing apart	disrupting apart
-break out	escape
-breaks out	escapes
-broke out	escaped
-broken out	escaped
-breaking out	escaping
-quake	tremble
-quakes	trembles
-quaked	trembled
-quaking	trembling
-become waterless	evaporate
-becomes waterless	evaporates
-became waterless	evaporated
-becoming waterless	evaporating
-become waterless	desiccate
-becomes waterless	desiccates
-became waterless	desiccated
-becoming waterless	desiccating
-rust	oxidation
-rusts	oxidations
-rust	oxidize
-rusts	oxidizes
-rusted	oxidized
-rusting	oxidizing
-rust	corrode
-rusts	corrodes
-rusted	corroded
-rusting	corroding
-come back	revert
-comes back	reverts
-came back	reverted
-coming back	reverting
-take the oath	assert
-takes the oath	asserts
-took the oath	asserted
-taken the oath	asserted
-taking the oath	asserting
-take the oath	asseverate
-takes the oath	asseverates
-took the oath	asseverated
-taken the oath	asseverated
-taking the oath	asseverating
-look after	supervise
-looks after	supervises
-looked after	supervised
-looking after	supervising
-look after	control
-looks after	controls
-looked after	controlled
-looking after	controlling
-send out	transmit
-sends out	transmits
-sent out	transmitted
-sending out	transmitting
-send out	release
-sends out	releases
-sent out	released
-sending out	releasing
-send out	exude
-sends out	exudes
-sent out	exuded
-sending out	exuding
-send out	envy
-sends out	envies
-sent out	envied
-sending out	envying
-send away from	expel from
-sends away from	expels from
-sent away from	expelled from
-sending away from	expelling from
-send away from	disclaim
-sends away from	disclaims
-sent away from	disclaimed
-sending away from	disclaiming
-thrust out	expulse
-thrusts out	expulses
-thrusted out	expulsed
-thrusting out	expulsing
-thrust out	expel
-thrusts out	expels
-thrusted out	expelled
-thrusting out	expelling
-thrust out	recycle
-thrusts out	recycles
-thrusted out	recycled
-thrusting out	recycling
-set out	establish
-sets out	establishes
-set out	established
-setting out	establishing
-shear	barber
-shears	barbers
-sheared	barbered
-shearing	barbering
-high school	superior school
-high schools	superior school
-harden	indurate
-hardens	indurates
-hardened	indurated
-hardening	indurating
-harden	solidify
-hardens	solidifies
-hardened	solidified
-hardening	solidifying
-harden	endure
-hardens	endures
-hardened	endured
-hardening	enduring
-go astray	stray
-goes astray	strays
-gone astray	strayed
-went astray	strayed
-going astray	straying
-shun	avoid
-shuns	avoids
-shunned	avoided
-shunning	avoiding
-shun	evade
-shuns	evades
-shunned	evaded
-shunning	evading
-lose the way	stray
-loses the way	strays
-lost the way	strayed
-losing the way	straying
-get lost	fail the way
-gets lost	fails the way
-got lost	failed the way
-gotten lost	failed the way
-getting lost	failing the way
-get lost	perdure
-gets lost	perdures
-got lost	perdured
-gotten lost	perdured
-getting lost	perduring
-get lost	depart
-gets lost	departs
-got lost	departed
-gotten lost	departed
-getting lost	departing
-get hungry	famish
-gets hungry	famishes
-got hungry	famished
-gotten hungry	famished
-getting hungry	famishing
-sprawl	extension
-sprawls	extensions
-sprawl	expansion
-sprawls	expansions
-sprawl	extend
-sprawls	extends
-sprawled	extended
-sprawling	extending
-sprawl	expand
-sprawls	expands
-sprawled	expanded
-sprawling	expanding
-sprawl	collapse
-sprawls	collapses
-sprawled	collapsed
-sprawling	collapsing
-crave	aspire to
-craves	aspires to
-craved	aspired to
-craving	aspiring to
-crave	desire
-craves	desires
-craved	desired
-craving	desiring
-become solid	solidify
-becomes solid	solidifies
-became solid	solidified
-becoming solid	solidifying
-get less	diminish
-gets less	diminishes
-got less	diminished
-gotten less	diminished
-getting less	diminishing
-get smaller	decrease
-gets smaller	decreases
-got smaller	decreased
-gotten smaller	decreased
-getting smaller	decreasing
-take out of	eliminate from
-takes out of	eliminates from
-taken out of	eliminated from
-took out of	eliminated from
-taking out of	eliminating from
-take out of	carry from
-takes out of	carries from
-taken out of	carried from
-took out of	carrying from
-taking out of	carry from
-call with a loud voice	exclaim vociferously
-calls with a loud voice	exclaims vociferously
-called with a loud voice	exclaimed vociferously
-calling with a loud voice	exclaiming vociferously
-cry out with a loud voice	cry out vociferously
-cries out with a loud voice	cries out vociferously
-cried out with a loud voice	cried out vociferously
-crying out with a loud voice	crying out vociferously
-come near	move closer
-comes near	moves closer
-came near	moved closer
-coming near	moving closer
-come near	approach
-comes near	approaches
-came near	approached
-coming near	approaching
-draw near	approach
-draws near	approaches
-drew near	approached
-drawing near	approaching
-draw near	access
-draws near	accesses
-drew near	accessed
-drawing near	accessing
-come about	transpire
-comes about	transpire
-came about	transpire
-coming about	transpire
-come about	occur
-comes about	occurs
-came about	occurred
-coming about	occurring
-bore	perforate
-bores	perforates
-bored	perforated
-boring	perforating
-bore	punch
-bores	punches
-bored	punched
-boring	punching
-bore	pierce
-bores	pierces
-bored	pierced
-boring	piercing
-bore	aperture
-bores	apertures
-boring	tedious
-borrow	acquire
-borrows	acquires
-borrowed	acquired
-borrowing	acquiring
-borrow	occupy
-borrows	occupies
-borrowed	occupied
-borrowing	occupying
-tear down	demolish
-tears down	demolishes
-tore down	demolished
-torn down	demolished
-tearing down	demolishing
-build up	construct
-builds up	constructs
-built up	constructed
-building up	constructing
-rebuild	restore
-rebuilds	restores
-rebuilt	restored
-rebuilding	restoring
-rebuild	reconstruct
-rebuilds	reconstructs
-rebuilt	reconstructed
-rebuilding	reconstructing
-hug	embrace
-hugs	embraces
-hugged	embraced
-hugging	embracing
-hit	buffet
-hits	buffets
-hit	buffeted
-hitting	buffeting
-man’s	masculine
-man’s	human
-man’s	male
-helpful	beneficial
-helpful	serviceable
-sugar free	no addition of sugar
-sugar free	no sugar added
-nearest	adjacent
-mad	demented
-mad	insane
-mad	stupid
-madness	insanity
-madness	stupidity
-friend	amigo
-friends	amigos
-friend	amy
-friends	amies
-wild west	savage west
-wild animal	savage animal
-wild animals	savage animals
-while	during this moment
-while	during this time
-while	during this period
-isn't	is not
-weft	fiber
-wefts	fibers
-woof	fiber
-woofs	fibers
-woven	fibered
-weft	interlace
-wefts	interlaces
-woof	interlace
-woofs	interlaces
-thread	filament
-threads	filaments
-knitted material	joined material
-knitted material	interlaced material
-a man	a hombre
-the man	the hombre
-men,	hombres,
-men.	hombres.
-man.	male.
-men.	males.
-man,	male,
-men,	males,
-woman	female
-women	females
-woman	mulcher
-women	mulchers
-ember	fervid carbon
-embers	fervid carbons
-shackle	chain
-shackles	chains
-shackle	manacle
-shackles	manacles
-madman	demented person
-madmen	demented people
-wedding dress	nuptial dress
-wedding dresses	nuptial dresses
-loathing	aversion
-loathings	aversions
-loathing	abhorrence
-loathings	abhorrences
-upright	honest
-upright	frank
-upright	rectitudinous
-uprightness	rectitude
-uprightness	nobility
-uprightnesses	rectitudes
-uprightnesses	nobilities
-leek	allium porrum
-leeks	allium porrums
-trust	confide
-trust	confidence
-trust	reliance
-leave	remain
-leave	abandon
-raise up	elevate up
-raises up	elevates up
-raised up	elevated up
-raising up	elevating up
-cut off	exterminate
-cuts off	exterminates
-cut off	exterminated
-cutting off	exterminating
-didn't	did not
-swear	asseverate
-swear	affirm
-swears	asseverates
-swears	affirms
-swore	asseverated
-swore	affirmed
-sworn	asseverated
-sworn	affirmed
-swearing	asseverating
-swearing	affirming
-most	majorly
-most	majority
-most	extremely
-most	perfectly
-most	perfectly
-most	perfect
-most	greatly
-most	numerously
-best	superior
-best	finest
-better	superior
-better	superiorly
-better	excellent
-spread	propagation
-spread	distribution
-spread	dissemination
-spread	proliferation
-spread	propagate
-spreads	propagations
-spreads	distributions
-spreads	disseminations
-spreads	proliferations
-spreads	propagates
-spreaded	disseminated
-spreaded	propagated
-spreading	disseminating
-spreading	propagating
-fall in love	enamor
-fell in love	enamored
-fallen in love	enamored
-falls in love	enamors
-send a proclamation	proclaim
-sends a proclamation	proclaims
-sent a proclamation	proclaimed
-sending a proclamation	proclaiming
-send	dispatch
-send	compel
-send	expel
-send	consign
-send	direct
-send	move
-send	displace
-send	transmit
-sends	dispatches
-sends	compels
-sends	expels
-sends	consigns
-sends	directs
-sends	moves
-sends	displaces
-sends	transmits
-sent	dispatched
-sent	compelled
-sent	expelled
-sent	consigned
-sent	directed
-sent	moved
-sent	displaced
-sent	transmitted
-sending	dispatching
-sending	compelling
-sending	expelling
-sending	consigning
-sending	directing
-sending	moving
-sending	displacing
-sending	transmitting
-good deed	benefaction
-evil deed	malefaction
-shiny	lustrous
-shortcoming	deficiency
-shortcomings	deficiencies
-egg	ovo
-eggs	ovoes
-gather around	circumduce
-gathers around	circumduces
-gathered around	circumduced
-gathering around	circumducing
-thoughtlessly	inconsiderately
-thoughtlessly	irreflexively
-thoughtless	inconsiderate
-thoughtless	irreflexive
-four-footed	quadruped
-four-footed	quadrupedal
-four-footed	quad-footed
-rod	cane
-rods	canes
-raw	crude
-cut out	separate
-cuts out	separates
-cut out	separated
-cutting out	separating
-awl	puncheon
-awls	puncheons
-road	route
-road	pavement
-road	itinerary
-roads	routes
-roads	pavements
-roads	itineraries
-break	ruin
-breaks	ruins
-broke	ruined
-broken	ruined
-breaking	ruining
-break	fracture
-breaks	fractures
-broke	fractured
-broken	fractured
-breaking	fracturing
-unquenchable	inextinguishable
-loose	liberate
-looses	liberates
-loosed	liberated
-loosing	liberating
-loose	reduce
-looses	reduces
-loosed	reduced
-loosing	reducing
-drench	irrigate
-drenches	irrigates
-drenched	irrigated
-drenching	irrigating
-swallow	ingest
-swallows	ingests
-swallowed	ingested
-swallowing	ingesting
-swallowing	ingestion
-swallowing	consumption
-write	scribe
-writes	scribes
-wrote	scribed
-written	scribed
-writing	scribing
-writing	inscription
-writing	letter
-writing	message
-writing	scripture
-writing	inscription
-swallow up	devour
-swallows up	devours
-swallowed up	devoured
-swallowing up	devouring
-eat up	devour
-eats up	devours
-ate up	devoured
-eaten up	devoured
-eating up	devouring
-sprout up	vegetate up
-sprouts up	vegetates up
-sprouted up	vegetated up
-sprouting up	vegetating up
-hill	mound
-hill	mount
-hill	rock
-hills	mounds
-hills	mounts
-hills	rocks
-go outside	exit externally
-goes outside	exits externally
-gone outside	exited externally
-went outside	exited externally
-going outside	exiting externally
-go out	exit
-goes out	exits
-gone out	exited
-went out	exited
-going out	exiting
-go in	enter
-goes in	enters
-gone in	entered
-went in	entered
-going in	entering
-lift	elevate
-lifts	elevates
-lifted	elevated
-lifting	elevating
-has read	has recited
-have read	have recited
-had read	had recited
-women's	feminine
-men's	masculine
-lovely	amorous
-underwear	subgarment
-belly	abdomen
-bellies	abdomens
-high quality	superior quality
-wife	female spouse
-wives	female spouses
-seller	vendor
-sellers	vendors
-thanks to	gratitude to
-thankfulness	gratitude
-song	canto
-songs	cantos
-song	cantion
-songs	cantions
-ugliness	deformity
-ugliness	deformities
-whisk	beater
-whisks	beaters
-learn	study
-learns	studies
-learned	studied
-learning	studying
-learn	recognize
-learns	recognizes
-learned	recognized
-learning	recognizing
-thin out	decrease
-thins out	decreases
-thinned out	decreased
-thinning out	decreasing
-thin out	dilute
-thins out	dilutes
-thinned out	diluted
-thinning out	diluting
-get rid of	dispose of
-gets rid of	disposes of
-got rid of	disposed of
-gotten rid of	disposed of
-getting rid of	disposing of
-moon eclipse	lunar eclipse
-blot out	obliterate
-blots out	obliterates
-blotted out	obliterated
-blotting out	obliterating
-the ends	the determinations
-the end	the determination
-an end	a determination
-deer	cervid
-deers	cervids
-with answer	with response
-with answers	with responses
-early	prematurely
-friendship	amity
-total warning	total caution
-total warnings	total cautions
-first fruit	primary fruit
-first fruits	primary fruits
-first time	primary time
-whistle	sibilate
-whistles	sibilates
-whistled	sibilated
-whistling	sibilating
-drive them out	expel them
-drives them out	expels them
-driven them out	expelled them
-driving them out	expelling them
-drive it out	expel it
-drives it out	expels it
-driven it out	expelled it
-driving it out	expelling it
-drive her out	expel her
-drives her out	expels her
-driven her out	expelled her
-driving her out	expelling her
-hunger	famine
-hungers	famines
-thing under the ban	prohibited matters
-things under the ban	prohibited matters
-detestable thing	abominations
-detestable things	abominations
-thing under the ban	prohibited matters
-things under the ban	prohibited matters
-detestable thing	abominations
-detestable things	abominations
-the first to remain a like	the primary to remain a favor
-house of the dominator	temple of the dominator
-time is getting short	time is expiring
-time is getting short	time is brief
-don’t take it to heart	do not receive it cordially
-it's a good idea	it is a bounteous idea
-in short	briefly
-as soon as	as promptly as
+"": "",
 
+    # Add more terms as needed
+}
 
-https://chrome.google.com/webstore/detail/replacer/cnaegfealmimnhmjhieeokofoeddejjk
+# Sample text
+text = """
+In the commencement, Diue created the celestial places and Earth. Presently, people abhor irregular verbs because they do not follow the standard rules for conjugation, making them harder to remember. This unpredictability often leads to confusion and frustration, especially for those learning English as a second language. The effort required to remember the various forms of each irregular verb can seem daunting compared to the simplicity of regular verbs, which adhere to a consistent pattern.
+"""
+
+# Function to replace terms based on the dictionary
+def replace_terms(text, dictionary):
+    for key, value in dictionary.items():
+        text = re.sub(r'\b' + re.escape(key) + r'\b', value, text)
+    return text
+
+# Apply the dictionary to the text
+modified_text = replace_terms(text, personal_dictionary)
+print(modified_text)
